@@ -7,6 +7,14 @@ categories: jekyll update
 
 書いた人: @nikezono
 
+# 要約
+
+並行処理において読み書き両方でロックを使うアプローチを「悲観的並行制御」と呼び,
+読み込みの際はロックを用いず, バリデーションをもってロックを使った際と挙動が等価であることを判定するアプローチ「楽観的並行制御」を提案する.
+
+これにより参照ヘビーなワークロードでほぼロックを用いないためオーバヘッドを大きく削減できる.
+しかしLong Transactionに対する耐性が課題として生まれた.
+
 # ACM Refs
 
 ```
@@ -150,10 +158,9 @@ readしたものをまた読んだ際はrepeatable readのために`read set`か
 
 が,インメモリDBでは共有メモリを扱えるため, Backward Validationはシンプルに以下のように実装できる.
 
+以下は`x`と`y`を読み, `x`をインクリメントするトランザクションの実装.
+
 ```ruby
-
-# read x and y, write x
-
 # Read Phase
 my_tid = get_tid()
 
@@ -162,9 +169,7 @@ local_y = read("y")
 
 local_x_dirty = local_x++
 
-
 # Validation Phase
-
 lock(x);
 
 latest_x = read("x")
@@ -249,6 +254,8 @@ MySQLやPostgreSQLといったOSSのRDBMSはこのようなクエリが両方共
 
 # 参考
 
-* [Optimistic Concurrency Controlについて](http://qiita.com/kumagi/items/aad314574e1986f7243b)
+* [Optimistic Concurrency Controlについて](http://qiita.com/kumagi/items/aad314574e1986f7243b): @kumagi さんの説明
+* [どこかの大学の講義資料](https://pdfs.semanticscholar.org/b9b2/e39c26f9870491bb770e4608fcd197d34edb.pdf)
+* [その2](http://www.cse.scu.edu/~jholliday/COEN317S05/RamirezSlides.ppt)
 
 [Silo]:http://dl.acm.org/citation.cfm?id=2522713
