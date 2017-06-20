@@ -17,7 +17,7 @@ permalink: /about/
 
 ## [@ytanaka][] 
 
-
+情報推薦/ユーザインタフェース
 
 [@nikezono]: htttps://github.com/nikezono
 [@ytanaka]: https://github.com/ytanaka-
