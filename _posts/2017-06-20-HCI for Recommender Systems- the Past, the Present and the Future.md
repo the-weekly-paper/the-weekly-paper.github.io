@@ -7,7 +7,7 @@ categories: jekyll update
 
 
 ## 要約
-どのようにして自分の興味にあったもの見つけるか。
+どのようにして自分の興味にあったものを見つけるか。
 情報爆発の時代の進みに伴って90年代から情報推薦システムの研究は歩みを続けてきた。
 研究初期にテーマとなったのは推薦アルゴリズムとF値を用いた予測評価の精度であった。その後、焦点はヒューマンファクターな部分、特にUXや結果透明性のためのビジュアライゼーションやユーザコントロールに移った。
 本論文では推薦システムのHCIに関する部分を対象にしつつ、これまでの研究分野の解析や今後のトピックに関して論ずる。
@@ -33,6 +33,7 @@ DOI: https://doi.org/10.1145/2959100.2959158
 Tapestryの二年後の1994年にResnickら[2]により、アイテム評価値からユーザー間の類似度を計算しその情報を用いて未知のアイテムの評価値を算出する、という現在の協調フィルタリングのベースとなるアイデアが提案された。
 
 そこから20数年に渡って推薦分野の研究は進んできたが、論文数の遷移としては以下の図のように年々増えて来ており、特にReview論文は2005年と2010年頃の二回スパイクがある。
+スパイクの理由として推薦システムのトピックに変化があったことがある。2005年頃にAdaptiveな推薦やメモリベースでなくユーザモデルを用いた推薦アルゴリズムが登場したこと、2009年頃にはSNSの情報を用いた信頼性指向の推薦システムが現れたことによるものと考えられる。
 
 ![](https://gyazo.com/707fe3d93f29e7ecb38a6bd6a83378f1.png)
 
@@ -41,9 +42,9 @@ Tapestryの二年後の1994年にResnickら[2]により、アイテム評価値�
 
 
 ### 現在
-近年の研究の焦点は、推薦精度というよりも推薦の効用に関するもの、例えばビジュアライゼーションを組み合わせることで推薦の説明性や透明性を付け加えたりすることによって推薦されたものへの興味を増強する、といったようなものになっている。
+近年の研究の焦点は、推薦精度というよりも推薦の効用に関するものに遷移している。例えばビジュアライゼーションを組み合わせることで推薦の説明性や透明性を付け加えることによって、推薦されたものへの興味を増強するといったものになっている。
 
-このような推薦をBlackboxにせず、ユーザインタフェースを通してアイテムに対する説明性をあげたり推薦のコントロール性を提供している例としてTasteWeights[5]がある。
+このような推薦をBlackboxにせず、ユーザインタフェースを通してアイテムに対する説明性をあげたり、推薦のコントロール性を提供している例としてTasteWeights[5]がある。
 TasteWeightsはユーザに対して、現在の推薦で使われているアイテムの特徴と協調フィルタリングで使われる特徴を以下のように視覚化する。
 さらに推薦に使われる重みを調節できるようなインタフェースも提供し、適合性フィードバックを通して嗜好を抽出して更新することができる。（図は[5]から引用）
 
@@ -51,11 +52,14 @@ TasteWeightsはユーザに対して、現在の推薦で使われているア�
 
 ### 今後の焦点
 
-これまでの推薦システムで使われた著者キーワードを解析したところ以下のような結果となった。
+これまでの推薦システムに関する論文で使われた著者キーワードを解析したところ以下のような結果となった。
+前述したように2005年頃にadaptiveやuser modelといったキーワードが増えており、snsの普及に伴ってtrustが増え2009年頃にピークを迎えていることが見て取れる。
 
 ![](https://gyazo.com/0cd4da9c0efe8b0527d77f2f10cd41fc.png)
 
-アルゴリズムに関する研究が主流な一方でHCIに関するものも未だに根強く続いていることが見て取れる。最後に今後の研究でポイントとなるだろう4つの側面について論じることにしたい。
+推薦アルゴリズムの改善を訴える研究者が多い一方で、HCIに関するものも未だに根強く続いていることが見て取れる。近年のReviewではユーザに焦点を当てたものもいくつか存在している([9]など)。
+
+最後に上記コーパス解析から得た結果を踏まえて、HCIに関連するキーワードのなかから重要であるが未だに議論が不十分だと我々が考える4つのトピックについて論じることにしたい。
 
 #### User control
 現在のインタラクティブな推薦システムの研究は、推薦に使われるパラメータやユーザプロファイルをコントロール可能とすることに焦点を当てている。しかしこのようなコントロール性だけでは高い信頼性やプライバシーに関する問題の対処としては不十分である。さらなる研究として、どのような目的でデータを追跡したり考慮するのかをより高いレベルでユーザが調整可能にできるものが求められる。
@@ -111,7 +115,7 @@ Kulkarniら[8]はSocial Annotationがニュースリーディングに及ぼす�
 近年はDeepLearningなどの機械学習分野の発展が著しいこともあるとは思うが、この論文でも触れられていたように推薦システムの分野でのHCIに関する研究は下火になりつつある。
 情報検索にしても情報推薦にしても、やはりメインになるのはそこで返される内容であり結果のリストであるというのはおそらく真理なのではないか。とはいえGoogleやAmazonの登場で細かいながらもHCIの研究が進んだことも事実だろう。
 
-可能性があるとすれば情報を取得するためのユーザインタラクション、それ自体に何か変化をもたらすこと、つまりこれまでに得られた知見を生かした全く新しい情報推薦アプリケーションをHCIとバックエンドにあるアルゴリズムを組み合わせることによって作り上げるしかない気がするがどうなんだろうか。
+この論文が取り上げているユーザコントロール性・適応的なインタフェースといったトピックが現実世界に応用される可能性があるとすれば、情報を取得するためのユーザインタラクション、それ自体に何か変化をもたらすこと、つまりこれまでに得られた知見を生かした全く新しい情報推薦アプリケーションをHCIとバックエンドにあるアルゴリズムを組み合わせることによって作り上げるしかない気がするがどうなんだろうか。
 
 
 ## 引用
@@ -131,10 +135,11 @@ sity in recommender systems. In Proceedings of the 33rd International ACM SIGIR
 Conference on Research and Development in Information Retrieval, SIGIR '10, pp.210{217, New York, NY, USA, 2010. ACM.
 
 [7] Cai-Nicolas Ziegler, Sean M. McNee, Joseph A. Konstan, and Georg Lausen. Improv-
-ing recommendation lists through topic diversication. In Proceedings of the 14th
+ing recommendation lists through topic diversification. In Proceedings of the 14th
 International Conference on World Wide Web, WWW '05, pp. 22{32, New York, NY, USA, 2005. ACM.
 
-[8] Chinmay Kulkarni and Ed Chi. All the news that's t to read: A study of social annotations for news reading. In Proceedings of the SIGCHI Conference on Human Factors in Computing Systems, CHI '13, pp. 2407{2416, New York, NY, USA, 2013. ACM.
+[8] Chinmay Kulkarni and Ed Chi. All the news that's fit to read: A study of social annotations for news reading. In Proceedings of the SIGCHI Conference on Human Factors in Computing Systems, CHI '13, pp. 2407{2416, New York, NY, USA, 2013. ACM.
 
+[9] Joseph A. Konstan and John Riedl. 2012. Recommender systems: from algorithms to user experience. User Modeling and User-Adapted Interaction 22, 1-2 (April 2012), 101-123. DOI=http://dx.doi.org/10.1007/s11257-011-9112-x
 
 記事を書いたひと:@ytanaka
