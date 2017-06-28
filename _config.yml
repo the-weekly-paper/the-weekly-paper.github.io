@@ -18,15 +18,16 @@ email: nikezono+paper@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   論文紹介ブログ
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://the-weekly-paper.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: 
 github_username:  the-weekly-paper
+google_analytics: UA-101782909-1
 
 # Build settings
 markdown: kramdown
 kramdown:
    input: GFM
-   hard_wrap: false
+   hard_wrap: true
 theme: minima
 gems:
   - jekyll-feed
