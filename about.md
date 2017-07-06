@@ -19,7 +19,7 @@ permalink: /about/
 
 情報推薦/ユーザインタフェース
 
-[@nikezono]: htttps://github.com/nikezono
+[@nikezono]: https://github.com/nikezono
 [@ytanaka]: https://github.com/ytanaka-
 
 # 記事構成
