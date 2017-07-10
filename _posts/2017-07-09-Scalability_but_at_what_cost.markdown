@@ -108,5 +108,18 @@ GraphXは最適化したシングルスレッド実装(`Hilbert RAM`)に対し�
 
 `1.Introduction`と`5.Lesson Learned`の章を読むだけでも，システムについての考え方を変えてくれる良い論文である．
 
+# 参考資料
+
+* [著者のブログ記事](http://www.frankmcsherry.org/graph/scalability/cost/2015/01/15/COST.html)
+ こちらは詳細に情報が書いてあり，良い．最後の
+> Here are two helpful guidelines (for largely disjoint populations):
+> 1.If you are going to use a big data system for yourself, see if it is faster than your laptop.
+> 2.If you are going to build a big data system for others, see that it is faster than my laptop.
+
+が面白い．
+
+* [the-morning-paperでの解説](https://blog.acolyer.org/2015/06/05/scalability-but-at-what-cost/)
+* [Hackernewsのスレッド](https://news.ycombinator.com/item?id=11855594)
+
 [アムダールの法則]:https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%A0%E3%83%80%E3%83%BC%E3%83%AB%E3%81%AE%E6%B3%95%E5%89%87
 [Universal Scalability Law]:http://www.perfdynamics.com/Manifesto/USLscalability.html
