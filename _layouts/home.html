@@ -12,7 +12,7 @@ title: Home
   </div>
   {% endunless %}
 
-  <div class="archive-item fadeInDown animated">
+  <div class="archive-item">
     <h2>{{ post.date | date: '%Y' }}</h2>
     <div>
 
@@ -28,7 +28,7 @@ title: Home
   </div>
   {% endunless %}
 
-  <div class="archive-item fadeInDown animated">
+  <div class="archive-item">
     <h2>{{ post.date | date: '%Y' }}</h2>
     <div>
 
@@ -38,7 +38,7 @@ title: Home
   <article>
     <a href="{{ post.url | absolute_url }}" title="{{ post.title }}">{{ post.title }}</a>
     <div class="post-date">
-      <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%-d %B" }}</time>
+      <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%m-%d" }}</time>
     </div>
   </article>
 
