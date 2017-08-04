@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include head.html %}
+  </head>
+  <body>
+    <main class="container {% if site.color_scheme %}{{ site.color_scheme }}{% else %}avocado{% endif %}">
+      {% if page.title == "Home" %}
+      <header class="fadeInLeft animated">
+      {% else %}
+      <header>
+      {% endif %}
+        {% include navigation.html %}
+      </header>
+
+      {{ content }}
+
+      <footer>
+        <p>
+        Contact us: <a href="{{site.url}}">GitHub</a> or <a href="site.email">mail</a>
+        </p>
+      </footer>
+    </main>
+
+    <!-- scripts -->
+    <script src="{{ '/assets/js/fluidvids.min.js' | relative_url }}"></script>
+    <script>
+      fluidvids.init({
+        selector: ['iframe', 'object'],
+        players: ['www.youtube.com', 'player.vimeo.com']
+      });
+    </script>
+  </body>
+</html>
