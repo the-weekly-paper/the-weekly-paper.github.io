@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "論文紹介: An empirical evaluation of in-memory multi-version concurrency control"
+title:  "An empirical evaluation of in-memory multi-version concurrency control"
 date:   2017-06-25 18:00:00 +0900
 categories: jekyll update
 ---

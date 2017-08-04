@@ -13,7 +13,6 @@ permalink: /about/
 ## [@nikezono][] 
 
 データベース/トランザクション/並行処理/情報検索インタフェース/探索的検索.
-主にシステム系論文を紹介します．
 
 
 ## [@ytanaka][] 
@@ -23,7 +22,16 @@ permalink: /about/
 [@nikezono]: https://github.com/nikezono
 [@ytanaka]: https://github.com/ytanaka-
 
-# コメント/修正/ご意見ご感想
+# 記事構成
 
-GitHub Pagesにて運用しています．
-コメントやご指摘，ご意見は[GitHub](https://github.com/the-weekly-paper/the-weekly-paper.github.io)のWiki/Issue/Pull Requestでどうぞ．
+記事の構成はおおむね以下である.
+
+1. タイトル
+1. 前置き
+1. Refs
+1. 内容紹介
+1. 所感
+1. 参考
+
+特に「所感」「参考」では, 原論文でreferされていないか, 原論文より以後に発表されたその後継となるようなアイデアを紹介する.
+

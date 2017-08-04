@@ -28,8 +28,7 @@ markdown: kramdown
 kramdown:
    input: GFM
    hard_wrap: true
-theme: brume
-color_scheme: azul
+theme: minima
 gems:
   - jekyll-feed
   - jekyll-sitemap

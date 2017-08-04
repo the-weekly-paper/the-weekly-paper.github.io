@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "論文紹介: On Optimistic Methods for Concurrency Control"
+title:  "On Optimistic Methods for Concurrency Control"
 date:   2017-06-11 18:17:58 +0900
 categories: jekyll update
 ---

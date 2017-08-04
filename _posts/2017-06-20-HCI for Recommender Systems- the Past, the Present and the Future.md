@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "論文紹介: HCI for Recommender Systems: the Past, the Present and the Future"
+title:  "HCI for Recommender Systems: the Past, the Present and the Future"
 date: 2017-06-20 05:27:02 +0900
 categories: jekyll update
 ---
