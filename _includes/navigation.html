@@ -1,5 +1,5 @@
 <nav id="main-navigation">
-  <a href="/"><h4>{{site.title}} <small>{{site.description}}</small></h4></a>
+  <a href="/"><h4>{{site.title}}: <small>{{site.description}}</small></h4></a>
   {% for link in site.data.links %}
   {% if page.title == link.title %}
   <a href="{{ link.url }}" title="{{ link.title }}" class="current">{{ link.title }}</a>

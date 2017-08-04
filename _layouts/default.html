@@ -5,11 +5,7 @@
   </head>
   <body>
     <main class="container {% if site.color_scheme %}{{ site.color_scheme }}{% else %}avocado{% endif %}">
-      {% if page.title == "Home" %}
-      <header class="fadeInLeft animated">
-      {% else %}
       <header>
-      {% endif %}
         {% include navigation.html %}
       </header>
 
@@ -17,7 +13,7 @@
 
       <footer>
         <p>
-        Contact us: <a href="{{site.url}}">GitHub</a> or <a href="site.email">mail</a>
+        Contact us: <a href="{{site.url}}">GitHub</a> or <a href="{{site.email}}">mail</a>
         </p>
       </footer>
     </main>
