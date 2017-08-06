@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "When Experts Agree: Using Non-Affiliated Experts to Rank Popular Topics"
+title:  "論文紹介: When Experts Agree: Using Non-Affiliated Experts to Rank Popular Topics"
 date:   2017-08-05 02:30:00 +0900
 categories: jekyll update
 ---
@@ -112,4 +112,3 @@ TargetScoreは、少なくとも2つ以上のExpertページからリンクさ�
 [1] https://en.wikipedia.org/wiki/Hilltop_algorithm
 [2] http://www.sem-r.com/news-2013/20131220143954.html
 [3] https://en.wikipedia.org/wiki/TrustRank
-
