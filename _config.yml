@@ -17,9 +17,10 @@ title: the weekly paper
 email: nikezono+paper@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   論文紹介ブログ
+repository: https://github.com/the-weekly-paper/the-weekly-paper.github.io
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://the-weekly-paper.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: 
+twitter_username:
 github_username:  the-weekly-paper
 google_analytics: UA-101782909-1
 
