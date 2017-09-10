@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "論文紹介: Translating Embeddings for Modeling Multi-relational Data"
-date:   2017-09-05 02:30:00 +0900
+date:   2017-09-11 03:10:00 +0900
 categories: jekyll update
 ---
 
