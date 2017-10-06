@@ -1,0 +1,168 @@
+---
+layout: post
+title:  "論文紹介: AcidRain: Concurrency Related Attacks on Database-Backed Web Applications"
+date:   2017-10-02 12:00:00 +0900
+categories: jekyll update
+---
+
+# 概要と紹介理由
+
+[Feral Concurrency Control][]と同じくPeter Bailisらの研究チームのSIGMOD2017論文.
+Feral Concurrency Controlの論文中で、データベースの分離レベルは性能と安全性のトレードオフであること，また，Webアプリケーション等では性能を重視するために弱い分離レベルを用いることが多く，安全性を保証する役割はO/Rマッパーが代行している，という現状が示された．勿論，弱い分離レベルの上では，O/Rマッパーを使ったとしてもその効果は完全ではなく，やはり異常がが発生しうる，ということがFeral Concurrency Controlの主旨であった．
+
+この論文では、更にその考察を深め，分離レベルを最大，すなわちSerializableにしても，やはりアプリケーションには異常があることを示した．これらの異常は，**アプリケーション開発者の設計の問題** であり，***近年のWebアーキテクチャと，データベースが提供するトランザクションや分離レベルといった概念が上手く噛み合っていない*** ことを示している．
+
+この論文は，データベース研究者に「性能を考えるよりも，トランザクションの恩恵に与るためのシンタックスとセマンティクスを考えなおせ」というPeter Bailisからの強いメッセージ性を感じるものであり，その意味で私の好きな論文の一つである．
+
+## ACIDRain Attacks
+
+一般にステートレスに実装されることの多いアプリケーションサーバに対して，
+共有状態(state)を持ち，かつ並列実行を行い，一貫性を守ることは長らくDBMSの責務であった.
+この責務を果たすため，基底の理論として[Serializability][]が生み出された．SerializabilityはJim GrayやStonebrakerといったチューリング賞受賞者を生んだ、DBMS研究の要石である.
+
+しかし現状で，Serializable分離レベルはかなり蔑ろにされている．その理由は簡単で、現実世界のWorkloadはConcurrentであることがあまりなかったのだ.殆どのビジネスでは、既知のクエリの組み合わせしか同時実行されない．役所の業務システム上では，同じIDの「ユーザ登録」と「ユーザ削除」が並行実行になることはほぼない．また，大抵のアプリケーションではキャッシュで事足りる情報が多く，DBMSには数トランザクション/秒ぐらいの量しか要求されない.これでConcurrencyに起因するバグが起きるかというと、意外と起きないものだ.
+
+一方、Web APIの文化はおおいに進展している. サービスやモノのインタフェースとして，APIを公開し，Webの流儀で広く開発者に公開する文化だ． これによって、ワークロードの流量も予測できなくなったし，同時に実行されるクエリの組み合わせも不定となった．となると，これまでの「既知の流量と組み合わせのワークロード」とはかなり異なり，並行実行による異常系のリスクは増大している．
+
+その典型例がビットコイン取引所[FlexCoin][]のケースだ．FlexCoinは2014年にサイバー攻撃を受け，管理するビットコインの多くを盗まれ，業務を停止した．FlexCoinの声明では，預金と引き出しのリクエストを大量に同時に実行された結果，システムが並行実行に耐えられなかったとしている．
+
+>The attacker. . . successfully exploited a flaw in the code
+which allows transfers between Flexcoin users. By
+sending thousands of simultaneous requests, the at-
+tacker was able to “move” coins from one user account
+to another until the sending account was overdrawn,
+before balances were updated. This was then repeated
+through multiple accounts, snowballing the amount,
+until the attacker withdrew the coins [1].
+
+
+すなわちトランザクション流に言えば[lost update](https://www.morpheusdata.com/blog/2015-02-21-lost-update-db)である.
+このような攻撃はこれからも起きていくだろう．
+
+この論文ではこれらのConcurrencyに起因する攻撃を `ACIDRain` と名付ける.また，この種の攻撃のための技術を開発し、eCommerceアプリケーションを題材に適用する. この試験を，GitHubに公開されているOSSアプリケーションに対して行ったところ，以下の事実が分かった．
+
+* 22パターンの脆弱性が20万のWebサイトで発見された.
+    * 現状の **インターネットに存在するECサイトの5割以上が脆弱性を持っている** ことになる．
+* 全ての脆弱性はOracleのdefaultであるRead Commitedで発生しうるもので、17の脆弱性はSerializableでも起きうるものだった.
+    * 特に， **ひとつのギフトカードを無限に使いまわして無制限に買い物ができる** などのクリティカルな脆弱性も発見された．
+
+この論文ではACIDRainを二つに分類する.
+
+1. DBMSのトランザクション分離レベルを低く設定していることに起因するもの
+2. アプリケーションのレベルで，プログラムオーダーで直列に実行することを期待しているロジックが、並行性に起因して正常に動作しないもの．
+    * APIの切り方が悪いとか，アプリケーションがステートを持ってしまっているとか．
+
+1の「トランザクション分離レベル」については図表が分かりやすい．
+
+![](https://gyazo.com/8b5d724e1c5b3c5e388f8546d88e2b71.png)
+
+トランザクションを正しく用いなければ，「読んで書く」というだけの処理でも並行アクセスによってバグが生じうる．また，それだけではダメで，分離レベルも正しく設定していて初めて安全に実行することが出来る．
+この話は，SIGMOD 2017の本論文のスライドでも言及されている．
+
+<script async class="speakerdeck-embed" data-id="1cb5a19e8e0d4463a7e661bf158de009" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+
+
+この次の，2の「アプリケーションのレベルで~」という議論が私にとってはこの論文の本丸である．
+たとえば下図のようなアプリケーションコードがあったとする．
+
+![](https://gyazo.com/ff55ecc7f51f83399bbfb8468a751262.png)
+
+`add_employee` と `raise_salary` という二つのメソッドがある． `add_employee` は従業員を追加するメソッドで， `raise_salary` は従業員の賃金を上げるメソッドだ．
+
+この二つのメソッドを順番に実行した場合の図が(b)である．直列に実行する分には，一件何の問題も無いように見える．しかし，この二つのメソッドには実はバグがある． `raise_salary` 9行目のwriteはトランザクション文の外にあるため，`add_employee`の実行と並行する可能性がある．給与が上がった後に，新従業員が登録されたため，新従業員は給与が上がっておらず，しかし13行目の`count * amt` では給与支払総額は全従業員の新給与の合計として計算してしまう，というものである．
+
+こういったケースは，これまでなら単純にアプリケーションのバグとして切り捨てて来たものであるが，この論文では，トランザクションの直列化可能性([Serializability][])の議論に則って問題を分解している．
+即ち， `add_employee` と `raise_salary` は以下の依存関係を持つ．
+
+![](https://gyazo.com/e48c9587ea59471b396a7f8161572e92.png)
+
+これは[Adya's Formalism](http://pmg.csail.mit.edu/papers/icde00.pdf)の定式化であり，見慣れた人には分かりやすいものだ．`r-w` `w-r` `w-w` の3つの依存関係を用いて各メソッドを分解すると，このような依存関係グラフを描くことができる．
+
+重要なのは， `raise_salary` メソッドは一つのメソッド(赤線)の中に複数のトランザクション(青線)を持っているということだ．この複数のトランザクションの間に，他のメソッド/トランザクションが並行実行された場合には，グラフが循環し，異常が起こりうるかもしれない，ということである．
+
+このケースは単に `raise_salary`　メソッドの実装がヘボだった，で済ませられる話だろうが，実際のWeb APIを用いるアプリケーションではそうはいかないこともある．マイクロサービス化などの煽りを受けて， **本来もともと一つのトランザクションであったものを細かく分割し，複数のAPIに切り出し，結果として一つのビジネスロジックが複数のDBへのクエリに分割される** ということはない話ではないだろう．このような状況はすなわち `add_employee`と`raise_salary` の問題そのものである．
+
+## 計測と評価
+
+本論文では，ACIDRainがOSSのアプリケーションにどれだけ起こっているか，12のeCommerceアプリケーションをGitHub上で選定し，静的解析にかけることで検証している．
+
+使われたフレームワークは以下:
+
+![](https://gyazo.com/a5c0485c8fd4fc67ef24a1b38dd7bbb1.png)
+
+分析手法としては、Web APIを叩いた際に生成されるSQL文を収集し、このSQLが *どのテーブルのどのカラムに触っているかという情報から，個々のAPI同士の依存関係を洗い出し，狙ってこの依存関係が循環するようなAPIの呼出しスケジュールを組み立てている*．
+実際のスクリプトも著者の[リポジトリ](https://github.com/stanford-futuredata/acidrain)で公開されている．
+
+![](https://gyazo.com/558d1c557c6e2bcdaaf825c5f6de67d3.png)
+
+もちろん，トランザクションの流儀で言えば，「依存関係が循環しているだけで **異常(Anomaly)** である」が，それはビジネスに影響をきたす **脆弱性(Vulnerability)** であるとは限らない．この手法で無数に異常が見つかったとしても，それが脆弱性でないのなら問題ではない．(自分で作った問題の形式の枠組みで議論しているに過ぎないため．)
+
+そこで具体的に狙われた脆弱性は以下:
+
+1. **決済系**: 決済なしで発送までこぎつける.
+1. **金券系**: ギフトカード(金券)を二回以上使う.
+1. **在庫系**: 在庫台帳を不正にする．在庫の無いものの購入リクエストを通す．
+
+さて，全eCommerce Websitesの50%にあたる200万のECサイトが上記のフレームワークのどれかを使っているが、なんとこれら **全てがギフトカードを無制限に使いまわせる異常がある** ことがわかった.
+
+詳細は省くが，**計22の脆弱性が発見され，9の決済系, 8の金券系, 5の在庫系脆弱性があった．このうち5つはDBの分離レベルによるものであった．** 17の異常は、アプリケーションコードが適切にトランザクションでラップされていない，あるいはAPIの切り方が正しくないことに起因した．**DB研究者が信じてきたSerializableでは防げない並行実行の異常がこれだけある** ということである．
+
+ちなみに，なんと全フレームワークの中で[Spree](https://github.com/spree/spree)だけは脆弱性がひとつも見つからなかった.
+
+## ACIDRainの対策
+
+設計レベルでは，決済を外部に移譲したり，カートの管理をセッション情報に入れるなどの工夫もありうるが，実装レベルとしては以下がありえる:
+
+* `SELECT FOR UPDATE` (リード時点での排他ロック)を使う
+    * Spreeだけこれを適切にやっていた
+* User Level Concurrency Control
+    * セッションファイルにロックをかける等．
+* Single read of data
+    * カートの商品の金額合計が決済額と同じことは当たり前だが，これができていないフレームワークが発見された.
+        * 決済中にカートの中身を二回読み出してしまい，一つは金額チェック，一つは購入物品のチェック...といった実装になっていると起こる．
+    * 決済処理中でカートの中身を読むのは一回(1Tx)だけにすればいい.
+* Multiple Validations:
+    * 決済の前と後で二回バリデーションを行うこと.
+    * 二回，決済リクエストが並行で走ってしまうこと自体は防げない．
+        * `if ([金券|credit] is valid)` のようなバリデーションは同時にすり抜けうる
+            * いわゆるrace conditionはあると考えなければいけない．
+* Potential fixes
+    * とりあえずisolation levelを上げろ
+* Developer Response
+    * この件に関してはGitHubの各リポジトリにチケット切ってみた.
+    * いくつかのOSSコミュニティはしっかり受け入れてくれた
+    * OpenCartのメンバには *"頭を使え！そんな起こりえないようなことのためにコード複雑にするわけないだろ"* と言われた
+    * Bloadleafのメンバは *仕様だ* と答えた
+        * (金券の二重使用について)このフレームワークの使い方わかってないんじゃない?と答えていた
+
+
+### 所感
+
+Webアプリケーションがデータベース業界の消費者の大きなマスを占めるということはあまり意識されてこなかった．Webアプリケーションの要件は結果整合性でも充分なケースが多く，MongoDBやMySQLの使われ方は，データベース研究者の考えるそれ(==トランザクション基盤)とは異なり， "シャーディングやレプリケーションの容易なストレージ" であった．当然，トランザクションの分離レベルなど誰も気にはしないし，Read Committedで起こる問題はユーザがバッチ/アドホックで対処していた．
+
+この使われ方の上でも，[Feral Concurrency Control][]等のアプローチによってトランザクションの不備は充分防げていた．これはトランザクション研究とWeb産業の断絶を示していた．
+
+が，一方で，**Web APIの設計自体に，並行性を考慮しきれておらずバグが存在することがある** ことをPeter Bailisは示した．特に面白いのは，この **設計のバグをトランザクションの流儀で理論的に定式化したこと** である．トランザクションの枯れた技術と論理を他の分野に適用することで，トランザクションそのものの研究領域を押し広げたという意味で，この論文は非常に意義深い．
+実際に起こるACIDRainに対する，今現在の実装で取りうる対策の部分の記述はかなりアドホックな解き方であり，物足りなさを感じないでもないが，著者Peter Bailisはおそらく実務でWebアプリケーションのバックエンドに携わった経験は少ないだろうから，無理はない．むしろ，彼らとしてはアドホックな設計指針を示すよりも，大統一理論のような新しいデータベースを研究開発して来るだろうし，それが楽しみだ．
+
+余談だが，OSSコミュニティに対してこれらのACIDRainを報告した際の反応が散々であったことを語る節(*4.2.6 Developer Response, Appendix B*)は，トップカンファレンスの論文にあるまじき感情を感じて面白い．
+
+> In contrast, the developer of OpenCart responded to
+the inventory vulnerability by posting a comment—“use your brain!
+its [sic] not hard to come up with a solution that does not involve
+coding!”—then closed both the inventory and voucher vulnerability
+issues and blocked us from responding. Broadleaf considers the
+voucher vulnerability a feature. That is, the Broadleaf developers
+responded to a similar ticket, indicating that they would prefer to
+allow concurrent voucher usage on the grounds that failed checkouts
+due to voucher overuse would result in poor user experience. It is
+unclear whether the developers recognize the threat due to malicious
+abuse of this functionality.
+
+
+
+[RCU]: url "title"
+[userspace rcu]: url "title"
+[Feral Concurrency Control]: https://the-weekly-paper.github.io/2017/07/23/feral_concuirrency_control.html
+[Serializability]:https://en.wikipedia.org/wiki/Serializability
+[FlexCoin]: http://itpro.nikkeibp.co.jp/article/NEWS/20140305/541425/?rt=nocnt
