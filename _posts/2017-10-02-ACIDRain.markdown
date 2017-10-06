@@ -160,7 +160,6 @@ unclear whether the developers recognize the threat due to malicious
 abuse of this functionality.
 
 
-
 [RCU]: url "title"
 [userspace rcu]: url "title"
 [Feral Concurrency Control]: https://the-weekly-paper.github.io/2017/07/23/feral_concuirrency_control.html
