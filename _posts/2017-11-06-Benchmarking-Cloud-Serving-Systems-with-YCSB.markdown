@@ -12,13 +12,11 @@ categories: jekyll update
 分散システムの時代が到来して，BigTableやRedis, MongoDBやCassandraといった"新しい"データベースが生まれてきた2010年．アカデミアにはある問題があった．それは，「これらの新しいデータベースを評価するベンチマークが無い」ということである．
 
 旧来よりデータベースの性能をフェアに測定するために用いられていたベンチマークは[トランザクション処理性能評議会(TPC)][TPC]が定めた[TPC-C][]や[TPC-H]といったベンチマークであった．
-これらのベンチマークは，データベースにデータモデリングの機能が備わっていることを暗に要求していた．すなわち，マルチレコードのトランザクションや，`JOIN` 等の機能がないとクエリを書くのが難しいものだった．また，TPC-Cは物流，TPC-Hは意思決定(統計)といったように，特定のユースケースを想定しているベンチマークだった．
+これらのベンチマークは，データベースにデータモデリングの機能が備わっていることを暗に要求しており，マルチレコードのトランザクションや，`JOIN` 等の機能がないとクエリを書くのが難しいものだった．また，TPC-Cは物流，TPC-Hは意思決定(統計)といったように，特定のユースケースを想定していて，単純なKVSなどのNoSQLの性能を比較するには，明らかに不適切だった．たとえば，KVS上でTPC-Cの物流のクエリを実装しようとすると，Keyの設計だけで性能がひと桁変わりそうなものだ．
 
-NoSQLムーブメントの背景の思想は，(私の考えでは，)性能のためにデータモデリングをデータベースから分離する，ということだと思う．正規化するよりも，KVSとして一つのテーブルに全てのデータを突っ込んでおいて，シャーディングやパーティショニングで性能優先の分割を行う．これはユーザ側でモデリングの指針を決める，という意味だと思う．また，非正規化することにより，マルチノードのトランザクションが起きにくくなるし，そもそも一つのkeyに必要なデータを全て押し込んで冗長化しておけば，マルチレコードのトランザクションすら要らなくなる，という思想がある．
+さて，そういうわけで，旧来のトランザクションを扱うデータベースとは異なる，新しいベンチマークが求められる時代である．また，新しいベンチマークでは，様々な尺度でのデータベースの性能特性の比較を行いたい．TPC-Cの性能が高くても，物流システムのバックエンドに据えた時の性能が良い，ということしか意味しないのでは困るからだ．もっと具体的に，たとえば，単純な`INSERT` の性能から，レンジスキャンが高速であるかどうか，とか，データの件数が増えたらどう，というレベルの話が知りたいわけだ．
 
-さて，そういうわけで，旧来のトランザクションを扱うデータベースとは異なる，新しいベンチマークが求められる．また，様々な尺度でのデータベースの性能特性の比較を行いたいーたとえば，単純な`INSERT` の性能から，レンジスキャンが高速であるかどうか，とか，その他諸々の細々した比較を．
-
-Yahooはこうした問題意識から，この論文で[Yahoo Cloud Serving Benchmark(YCSB)][YCSB]を提案している．この論文自体はプロジェクトの紹介と，アカデミアへの周知の意味が強いのか，「詳細はリポジトリ見ればわかるよな」という意思を感じる部分が多い．が，この論文以降，多くのデータベース系/トランザクション系論文が，評価実験のベンチマークにTPCとYCSBを両方採用しており，二つとも実装し実行することがスタンダードとなっている．これは， **TPCが実世界ワークロードを模したベンチマークであるならば，YCSBは細かい性能特性を見るのに適している** 設計となっているからだと思う．
+Yahooはこうした問題意識から，この論文で[Yahoo Cloud Serving Benchmark(YCSB)][YCSB]を提案している．論文自体はプロジェクトの紹介と，アカデミアへの周知の意味が強いのか，「詳細はリポジトリ見ればわかるよな」という意思を感じる部分が多い．が，この論文以降，多くのデータベース系/トランザクション系論文が，評価実験のベンチマークにTPCとYCSBを両方採用しており，二つとも実装し実行することがスタンダードとなっている．これは， **TPCが実世界ワークロードを模したベンチマークであるならば，YCSBは細かい性能特性を見るのに適している** 設計となっているからだと思う．
 
 ## YCSBを使いたいだけで，論文に興味はないという人
 
@@ -43,7 +41,7 @@ and HBase versus the simple hashtable model of Voldemort
 or the document model of CouchDB. However, the data
 models can be documented and compared qualitatively.
 
-BigTableのような列指向モデルや，CouchDBのようなドキュメントデータベースは，定性的に評価はできても，定量的にそのパフォーマンスを評価することは難しい．
+BigTableのような列指向モデルや，CouchDBのようなドキュメントデータベースは，定性的に評価はできても，定量的にそのパフォーマンスを評価することは難しい．なぜなら，アーキテクチャが全く違うからだ．
 
 > Understanding the performance implications of these decisions
 for a given type of application is challenging. Developers
@@ -51,14 +49,16 @@ of various systems report performance numbers for
 the “sweet spot” workloads for their system, which may not
 match the workload of a target application.
 
-また，定量的な評価を行うのも，このような種類の異なるデータベース間では極めて難しい．
+アーキテクチャの違いはそのまま性能特性の違いであるから，定量評価というのも一筋縄ではない．
 列指向DBは当然，列ごとの集計処理などが頻繁に行われることを想定しているし，クエリは同じでも，分散時のパーティションやシャーディングの構成次第で性能は大きく変わる．
 データベース開発者はみな， *sweet spot* つまり最も性能が出るワークロードやセッティングでの評価や報告しかしない．それはセールス上当然ではあるが，やはり，多角的かつ定量的に評価できる枠組みが求められる．
 
 > We focus on serving systems, which are systems
 that provide online read/write access to data.
 
-このYCSB Benchmarkの面白いところは，たとえばWebアプリケーションのバックエンドにデータベースを使う際などを想定して， *serving* システムに振り切っているところだ．つまり，YCSBはWorkload Generatorであって，それぞれのデータベースに対するバインディングやドライバとは分割しているのである．TPCでは，ストアドプロシージャ等の形でデータベース内にTPCのクエリを記述し，それを実行することで性能を計測することが多いが，YCSBはJVM上で動くJavaアプリケーションが， `read` や `insert` `update` といったメソッドを実行するという型をとっている．たとえば[Redisのドライバはこんな感じ](https://github.com/brianfrankcooper/YCSB/blob/master/redis/src/main/java/com/yahoo/ycsb/db/RedisClient.java)である．新しいデータベースを追加したいときは，単に`read`や`insert`のメソッドをoverrideして，そのデータベースをJDBCなりRedisラッパーなりを使って操作すればよい．こうすると，データベースの実装には手を入れずに，クラウド上のPaaSでもDBaaSでもなんでも同じ土俵で評価ができるというわけだ．
+このYCSB Benchmarkの面白いところは，たとえばWebアプリケーションのバックエンドにデータベースを使う際などを想定して， *serving* システムに振り切っているところだ．つまり，YCSBはWorkload Generatorであって，それぞれのデータベースの内部の実装は一切問題にしていないのである．TPCでは，ストアドプロシージャ等の形でデータベース内にTPCのクエリを記述し，それを実行することで性能を計測することが多いが，YCSBはJVM上で動くJavaアプリケーションが， `read` や `insert` `update` といったメソッドを実行するという形式をとっている．
+
+たとえば[Redisのドライバはこんな感じ](https://github.com/brianfrankcooper/YCSB/blob/master/redis/src/main/java/com/yahoo/ycsb/db/RedisClient.java)である．新しいデータベースを追加したいときは，単に`read`や`insert`のメソッドをoverrideして，そのデータベースをJDBCなりRedisラッパーなりを使って操作すればよい．こうすると，データベースの実装には手を入れずに，クラウド上のPaaSでもDBaaSでもなんでも同じ土俵で評価ができるというわけだ．
 
 # 2. CLOUD SYSTEM OVERVIEW
 
@@ -75,6 +75,8 @@ that provide online read/write access to data.
 そういうわけで，新しいデータモデリングや一貫性の考え方が登場してきて，今 `cloud-serving` なデータベース(いわゆるNoSQLムーブメント)として普及してきている．
 
 ## 2.2 Classification of Systems and Tradeoffs
+
+この章では，NoSQL系のデータベースが持つトレードオフについて述べる．
 
 ### Read performance versus write performance
 
@@ -109,7 +111,10 @@ readとwriteのシンプルなインタフェースだけを提供するKVSで�
 
 # 4. BENCHMARK WORKLOADS
 
-YCSB Benchmarkでは，Workloadを自由に作成し，様々な尺度で性能を比較することができる．Workloadには変数とスケールファクターがある．変数は，ワークロードの特性を決めるものだ．たとえば，CGM系のWebアプリのバックエンドなら，参照が多くアクセス頻度は冪乗則になる，等を決定できる．スケールファクターは，文字通り，データの件数が増えた際の挙動を計算するためのものだ． elasticでscalableなデータベースなら，件数が増えると分散システムのノード数も増えると想定できる．そのときの性能特性の変化を確認できる．
+YCSB Benchmarkでは，Workloadを自由に作成し，様々な尺度で性能を比較することができる．Workloadには変数とスケールファクターがある．
+
+変数は，ワークロードの特性を決めるものだ．たとえば，CGM系のWebアプリのバックエンドなら，参照が多くアクセス頻度は冪乗則になる，等を決定する．
+スケールファクターは，文字通り，データの件数が増えた際の挙動を計算するためのものだ． elasticでscalableなデータベースなら，件数が増えると分散システムのノード数も増えると想定できる．そのときの性能特性の変化を確認できる．
 
 ただし，実は論文中で紹介されている変数やスケールファクター以外にも，多くのパラメータが追加されている．[GitHubのリポジトリ](https://github.com/brianfrankcooper/YCSB/blob/master/workloads/workload_template)が最新のデータなので，それを見るのが一番手っ取り早い．
 
@@ -161,8 +166,8 @@ Update-HeavyなWorkload Aでは，Cassandraが非常にうまくやっている�
 TPCという古い遺産を引きずっていたアカデミアに，より汎用的で *extensible* なベンチマーク環境が登場したという点で，この論文の意義は大きい．後続する多くの研究論文ではこのYCSB Benchmarkが用いられている．
 
 一方で，このYCSB Benchmarkには重要な問題があると個人的には思っている．それは， **あくまでWorkload Generatorとしての責務しか持たず，Javaで書かれている** ことだ.
-何が問題なのかというと，たとえばCで書かれた高速なトランザクション処理を得意とするデータベース(最近のアカデミアの流行りだ)をテストする際に，あまりにもJNIのオーバーヘッドが大きすぎるということにある．
-これを嫌ってか，YCSBのドライバをJavaで書き，JNIを通してデータベースをコールするのではなく，CでYCSB相当のワークロードを自分で書いて，その結果を論文に載せるというアプローチが普及している．(有名ドコロだと，[SoSP '13のSilo](https://github.com/stephentu/silo/blob/master/benchmarks/ycsb.cc)とか，[SIGMOD '15のFOEDUS](https://github.com/HewlettPackard/foedus_code/issues/27)とか，[SIGMOD '16のERMIA](https://github.com/ermia-db/ermia/blob/98e8ca87ab6f2fd4ad081664808d89013d1518b8/benchmarks/ycsb.cc)とか)
+何が問題なのかというと，たとえばCで書かれた高速なトランザクション処理を得意とするデータベース(最近のアカデミアの流行りだ)をテストする際に，あまりにも **JNIのオーバーヘッドが大きすぎる** ということにある．
+これを嫌ってか，YCSBのドライバをJavaで書き，JNIを通してデータベースをコールするという，この論文が期待するアプローチではなく，CでYCSB相当のワークロードを自分で書いて，その結果を論文に載せるというアプローチが普及している．(有名ドコロだと，[SoSP '13のSilo](https://github.com/stephentu/silo/blob/master/benchmarks/ycsb.cc)とか，[SIGMOD '15のFOEDUS](https://github.com/HewlettPackard/foedus_code/issues/27)とか，[SIGMOD '16のERMIA](https://github.com/ermia-db/ermia/blob/98e8ca87ab6f2fd4ad081664808d89013d1518b8/benchmarks/ycsb.cc)とか)
 
 これではYCSB Benchmarkの `extensible` な良さ，つまり，提供されたインタフェースをoverrideしたJavaのコードを1ファイル書いてやるだけで横断的にあらゆるDBの比較ができる，という点が失われてしまう．
 
