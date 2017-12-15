@@ -7,6 +7,15 @@ categories: jekyll update
 
 書いた人: @nikezono
 
+# 追記
+
+この解説記事はあまりに内容が粗雑だった．
+別の機会に作成したスライドを貼っておく．
+これを読めばこの記事の本文を読む必要はそれほどない．
+(そもそも論文を読めば解説記事など読む必要はないのだが)
+
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/hcUrSTeZyZLgHU" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/nikezono/an-empirical-evaluation-of-inmemory-multiversion-concurrency-control-84134634" title="論文紹介: An empirical evaluation of in-memory multi-version concurrency control" target="_blank">論文紹介: An empirical evaluation of in-memory multi-version concurrency control</a> </strong> from <strong><a href="https://www.slideshare.net/nikezono" target="_blank">Sho Nakazono</a></strong> </div>
+
 # 要約
 
 **マルチバージョン同時実行制御(MVCC)** は昨今のDBMSにおいて最も使われている同時実行制御手法である．
