@@ -50,7 +50,8 @@ SELECT COUNT(*) FROM table;
 
 というクエリが，既にキャッシュしてある統計情報にヒットするだけで済んでくれればいいが，最悪の場合全パーティションから合算を行うことになるかもしれない．大陸間，惑星間でデータベースを分散している場合，こういうクエリはかなり厳しくなる．全てのサーバの計算を集約する必要があるからだ．これでは分散データベースはいたずらに性能を落とすだけになる．
 
-この論文では， **[Deneva](https://github.com/mitdbg/deneva)** というフレームワークを用いて分散トランザクションの実装を定量的に評価している．ここでは詳しく説明しないが，分散トランザクションには一貫性や分離性に関するいくつかの分類があり，たとえば[Eventual consistency](https://ja.wikipedia.org/wiki/%E7%B5%90%E6%9E%9C%E6%95%B4%E5%90%88%E6%80%A7)であるとか，[Linearizable](http://www.bailis.org/blog/linearizability-versus-serializability/)とか，色々ある．このDenevaでは，そのうち **Serializable** を念頭に置いている．
+この論文では， **[Deneva](https://github.com/mitdbg/deneva)** というフレームワークを用いて分散トランザクションの実装を定量的に評価している．
+ここでは詳しく説明しないが，分散トランザクションには一貫性や分離性に関するいくつかの分類があり，たとえば[Eventual consistency](https://ja.wikipedia.org/wiki/%E7%B5%90%E6%9E%9C%E6%95%B4%E5%90%88%E6%80%A7)であるとか，[Linearizable](http://www.bailis.org/blog/linearizability-versus-serializability/)とか，色々ある．このDenevaでは，そのうち **Serializable** を念頭に置いている．
 
 参考までに[Peter Bailis]()御大による分類図を貼っておく.
 ![](https://i.gyazo.com/53c7596e296144e5db1587ecfc7d82af.png)
@@ -255,7 +256,17 @@ occurs.
     * しかし，それでSerializableで防げていたバグが出てしまうのは困る．
     * 新しいプログラミングモデルでカバーできるとよい．
     * [このへんは前にブログで書いた](http://nikezono.net/2017/08/17/redbook/)
-    *
+ 
+# 結論&感想
+
+至極当然の結論として， **Serializableは分散システムでは厳しい** ということが導かれたように思う．
+一見して性能が良いように見えるDeterministic Databaseがとっているのは，Concurrency Control部分をすべて1台のサーバに移譲するアプローチだ．
+これでは1台のサーバ性能が頭打ちになっている，という問題に回答できているわけではない．
+
+ネットワークの性能向上にもいつしか限界があるから，並列化による性能向上の恩恵を受けたければ， **同期やロックを限界までなくす** しかない．
+となればプログラミングパラダイムから考えなおしましょう... というのは，筋のいい話だ．
+
+この論文自体は，ベンチマーク論文であり，わりと実装力に任せて書かれたものだと思うが，上記のような最近のトレンドに説得力を持たせるという意味では，良い論文だった．
 
 [ブルームフィルタ]: https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%AB%E3%83%BC%E3%83%A0%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF
 [RCU]: url "title"
