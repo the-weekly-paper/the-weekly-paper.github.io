@@ -201,8 +201,10 @@ Figure.3 はYCSB Workloadにおいてupdateの割合を上げていった際の�
 
 Figure 5は先ほどと同じくYCSB Workloadを実行し，Contention RateとUpdate Rateをそれぞれ固定し，サーバ台数を増やした実験である．Figure 6ではサーバ台数16台の際の各手法における処理時間の内訳を集計している．
 
-Figure 5は(a)(b)(c)とContention Rateを変えて実験しているが，先ほどの実験から見て取れるように，contention rateが高くなるとCALVINが一人勝ちの様相を呈する．それぞれの手法の処理時間の内訳をFigure 6で見てみると，(OCCは除いて)CALVINに対して他の手法は `2PC` の処理時間の比率が高い． すなわちサーバ間のメッセージングか，他のサーバのトランザクションの処理待ち，といった要素が支配項になっている．これを排することができるCALVINがContention Rateが高い際に一人勝ちする．
-Contention Rateが低い，Read-OnlyのFigure 6(a)を見ると，逆にCalvinが最も `idle` の時間が多いことがわかる．これは1つのサーバに決定論的なスケジュール生成を全て任せていることに起因する．
+Figure 5は(a)(b)(c)とUpdate RateとContention Rateを変えて実験しているが，先ほどの実験から見て取れるように，contention rateが高くなるとCALVINが一人勝ちの様相を呈する．それぞれの手法の処理時間の内訳をFigure 6で見てみると，(OCCは除いて)CALVINに対して他の手法は `2PC` の処理時間の比率が高い． 
+すなわちサーバ間のメッセージングか，他のサーバのトランザクションの処理待ち，といった要素が支配項になっている．これを排することができるCALVINがContention Rateが高い際に一人勝ちする．
+
+ただし，Contention Rateが低い，Read-OnlyのFigure 6(a)を見ると，逆に，Calvinが最も `idle` の時間が多いことがわかる．これは1つのサーバに決定論的なスケジュール生成を全て任せていることに起因する．
 
 ### 4.6 Network latency
 
