@@ -76,7 +76,7 @@ Denevaのアーキテクチャは以下．
 
 ## 3. Transaction Protocols
 
-比較実験する6子のstate-of-the-art protocolsを紹介する．
+比較実験するstate-of-the-art protocolsは６手法. それぞれを紹介し，簡単に説明する．
 
 ### 3.1 Two-Phase Locking
 
