@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "論文紹介: "An evaluation of distributed concurrency control"
+title:  "論文紹介: An evaluation of distributed concurrency control"
 date:   2018-01-19 12:00:00 +0900
 categories: jekyll update
 ---
