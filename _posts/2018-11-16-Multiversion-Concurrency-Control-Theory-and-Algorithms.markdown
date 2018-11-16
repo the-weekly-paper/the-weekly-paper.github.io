@@ -11,7 +11,7 @@ categories: jekyll update
 
 ### TL;DR
 - Multiversion Concurrency Control(MVCC)というものがある.
-    - 同じデータxについて，複数のバージョン(x1, x2, x3,...,xn)を保持できることを指す．
+    - 同じデータxについて，データベースが複数のバージョン(x1, x2, x3,...,xn)を保持できることを指す．
     - PostgreSQLもMySQLもOracleも猫も杓子もMVCCである．
 - このMVCCで使われるべき，マルチバージョンの直列化可能性(Multiversion Serializability, a.k.a. 1SR)をはじめて定義した論文．
     - この論文以前は，より許容しうる組み合わせのパターンが少ない(空間が狭い)直列化可能性しかなかった．
